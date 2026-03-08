@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface DiptychModalProps {
   diptych: [string, string];
@@ -19,6 +20,7 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
   onClose,
   initialLayout = "horizontal",
 }) => {
+  const { t } = useTranslation();
   const [isSwapped, setIsSwapped] = useState(false);
   const [layout, setLayout] = useState<"horizontal" | "vertical">(
     initialLayout,
@@ -76,7 +78,7 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
         <button
           className="toolbar-button"
           onClick={onPrev}
-          title="Anterior (←)"
+          title={t("modal.prev")}
         >
           <svg
             width="20"
@@ -95,7 +97,7 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
         <button
           className="toolbar-button"
           onClick={() => setIsSwapped(!isSwapped)}
-          title="Intercambiar (C)"
+          title={t("modal.swap")}
         >
           {layout === "horizontal" ? (
             <svg
@@ -131,8 +133,8 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
         <button
           className={`toolbar-button star-toggle-modal ${isStarred ? "is-starred" : ""}`}
           onClick={onToggleStar}
-          title={isStarred ? "Quitar destacado (S)" : "Marcar destacado (S)"}
-          aria-label={isStarred ? "Quitar destacado" : "Marcar destacado"}
+          title={isStarred ? t("modal.unstar") : t("modal.star")}
+          aria-label={isStarred ? t("modal.unstar") : t("modal.star")}
         >
           <svg
             width="20"
@@ -150,7 +152,7 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
           onClick={() =>
             setLayout(layout === "horizontal" ? "vertical" : "horizontal")
           }
-          title="Cambiar Diseño (V)"
+          title={t("modal.layout")}
         >
           {layout === "horizontal" ? (
             <svg
@@ -186,7 +188,7 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
         <button
           className="toolbar-button"
           onClick={onNext}
-          title="Siguiente (→)"
+          title={t("modal.next")}
         >
           <svg
             width="20"
@@ -207,7 +209,7 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
         <button
           className={`toolbar-button help-button ${showHelp ? "active" : ""}`}
           onClick={() => setShowHelp(!showHelp)}
-          title="Shortcuts (?)"
+          title={t("modal.shortcuts")}
         >
           <svg
             width="20"
@@ -227,33 +229,33 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
 
         {showHelp && (
           <div className="shortcuts-panel">
-            <div className="shortcuts-header">Shortcuts</div>
+            <div className="shortcuts-header">{t("modal.shortcutsTitle")}</div>
             <div className="shortcut-item">
               <span className="shortcut-key">← / →</span>
-              <span className="shortcut-desc">Anterior / Siguiente</span>
+              <span className="shortcut-desc">{t("modal.shortcutPrevNext")}</span>
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">C</span>
-              <span className="shortcut-desc">Intercambiar</span>
+              <span className="shortcut-desc">{t("modal.shortcutSwap")}</span>
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">S</span>
-              <span className="shortcut-desc">Destacar / quitar</span>
+              <span className="shortcut-desc">{t("modal.shortcutStar")}</span>
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">V</span>
-              <span className="shortcut-desc">Orientación H/V</span>
+              <span className="shortcut-desc">{t("modal.shortcutOrientation")}</span>
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">Esc</span>
-              <span className="shortcut-desc">Cerrar</span>
+              <span className="shortcut-desc">{t("modal.shortcutClose")}</span>
             </div>
           </div>
         )}
         <button
           className="toolbar-button toolbar-button-close"
           onClick={onClose}
-          title="Cerrar (Esc)"
+          title={t("modal.close")}
         >
           <svg
             width="20"

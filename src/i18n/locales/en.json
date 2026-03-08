@@ -1,0 +1,42 @@
+{
+  "app": {
+    "title": "Diptico",
+    "loading": "Loading saved state...",
+    "btnReset": "Reset",
+    "btnResetTitle": "Delete all images",
+    "btnGenerate": "Generate Diptychs",
+    "btnView": "View Diptychs ({{count}})",
+    "btnFlipOrientation": "Change orientation",
+    "btnFlipOrientationTitle": "Change Grid Layout",
+    "btnSelectAll": "Select all",
+    "btnSelectAllTitle": "Mark all as starred",
+    "btnSelectNone": "Select none",
+    "btnSelectNoneTitle": "Unstar all",
+    "btnDownload": "Download PDF ({{count}})",
+    "btnDownloading": "Generating..."
+  },
+  "dropzone": {
+    "drag": "Drag your images here",
+    "click": "Or click to select them"
+  },
+  "modal": {
+    "prev": "Previous (←)",
+    "next": "Next (→)",
+    "swap": "Swap (C)",
+    "star": "Star (S)",
+    "unstar": "Unstar (S)",
+    "layout": "Change Layout (V)",
+    "shortcuts": "Shortcuts (?)",
+    "close": "Close (Esc)",
+    "shortcutsTitle": "Shortcuts",
+    "shortcutPrevNext": "Previous / Next",
+    "shortcutSwap": "Swap",
+    "shortcutStar": "Star / Unstar",
+    "shortcutOrientation": "Orientation H/V",
+    "shortcutClose": "Close"
+  },
+  "grid": {
+    "star": "Star diptych",
+    "unstar": "Unstar diptych"
+  }
+}

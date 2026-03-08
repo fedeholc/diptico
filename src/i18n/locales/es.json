@@ -1,0 +1,42 @@
+{
+  "app": {
+    "title": "Diptico",
+    "loading": "Cargando estado guardado...",
+    "btnReset": "Reiniciar",
+    "btnResetTitle": "Eliminar todas las imágenes",
+    "btnGenerate": "Generar Dípticos",
+    "btnView": "Ver Dípticos ({{count}})",
+    "btnFlipOrientation": "Cambiar orientación",
+    "btnFlipOrientationTitle": "Cambiar Diseño de Grilla",
+    "btnSelectAll": "Seleccionar todos",
+    "btnSelectAllTitle": "Marcar todos como destacados",
+    "btnSelectNone": "Seleccionar ninguno",
+    "btnSelectNoneTitle": "Quitar destacado de todos",
+    "btnDownload": "Descargar PDF ({{count}})",
+    "btnDownloading": "Generando..."
+  },
+  "dropzone": {
+    "drag": "Arrastra tus imágenes aquí",
+    "click": "O haz clic para seleccionarlas"
+  },
+  "modal": {
+    "prev": "Anterior (←)",
+    "next": "Siguiente (→)",
+    "swap": "Intercambiar (C)",
+    "star": "Marcar destacado (S)",
+    "unstar": "Quitar destacado (S)",
+    "layout": "Cambiar Diseño (V)",
+    "shortcuts": "Shortcuts (?)",
+    "close": "Cerrar (Esc)",
+    "shortcutsTitle": "Shortcuts",
+    "shortcutPrevNext": "Anterior / Siguiente",
+    "shortcutSwap": "Intercambiar",
+    "shortcutStar": "Destacar / quitar",
+    "shortcutOrientation": "Orientación H/V",
+    "shortcutClose": "Cerrar"
+  },
+  "grid": {
+    "star": "Marcar destacado",
+    "unstar": "Quitar destacado"
+  }
+}

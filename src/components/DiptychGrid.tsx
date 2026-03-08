@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 type DiptychItem = {
   images: [string, string];
@@ -18,6 +19,7 @@ export const DiptychGrid: React.FC<DiptychGridProps> = ({
   onToggleStar,
   layout,
 }) => {
+  const { t } = useTranslation();
   if (diptychs.length === 0) return null;
 
   return (
@@ -37,9 +39,9 @@ export const DiptychGrid: React.FC<DiptychGridProps> = ({
             <button
               type="button"
               className={`star-toggle ${diptych.starred ? "is-starred" : ""}`}
-              title={diptych.starred ? "Quitar destacado" : "Marcar destacado"}
+              title={diptych.starred ? t("grid.unstar") : t("grid.star")}
               aria-label={
-                diptych.starred ? "Quitar destacado" : "Marcar destacado"
+                diptych.starred ? t("grid.unstar") : t("grid.star")
               }
               onClick={(e) => {
                 e.stopPropagation();

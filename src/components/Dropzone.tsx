@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import diptico from "../assets/diptico.png";
 
 interface DropzoneProps {
@@ -6,6 +7,7 @@ interface DropzoneProps {
 }
 
 export const Dropzone: React.FC<DropzoneProps> = ({ onFilesSelected }) => {
+  const { t } = useTranslation();
   const [isActive, setIsActive] = useState(false);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -61,10 +63,10 @@ export const Dropzone: React.FC<DropzoneProps> = ({ onFilesSelected }) => {
         <img src={diptico} alt="Diptico" />
       </div>
       <p style={{ fontSize: "1.2rem", fontWeight: 600 }}>
-        Arrastra tus imágenes aquí
+        {t("dropzone.drag")}
       </p>
       <p style={{ color: "var(--text-secondary)", marginTop: "0.5rem" }}>
-        O haz clic para seleccionarlas
+        {t("dropzone.click")}
       </p>
     </div>
   );

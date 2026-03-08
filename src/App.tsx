@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { jsPDF } from "jspdf";
 import { Dropzone } from "./components/Dropzone";
 import { ImageGrid } from "./components/ImageGrid";
@@ -20,6 +21,7 @@ type DiptychItem = {
 };
 
 function App() {
+  const { t } = useTranslation();
   const [images, setImages] = useState<string[]>([]);
   const [diptychs, setDiptychs] = useState<DiptychItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -172,7 +174,7 @@ function App() {
         format: "a4",
       });
     } catch (error) {
-      console.error("Error al generar PDF:", error);
+      console.error(t("app.errorPDF"), error);
     }
 
     if (!doc) {
@@ -279,7 +281,7 @@ function App() {
     doc.save("dipticos-generados.pdf");
     setIsDownloading(false);
     return;
-  }, [diptychs, gridLayout]);
+  }, [diptychs, gridLayout, t]);
 
   const canGenerate = images.length >= 2;
   const hasGenerated = diptychs.length > 0;
@@ -288,14 +290,14 @@ function App() {
   if (!isInitialized) {
     return (
       <div className="loading-screen">
-        <p>Cargando estado guardado...</p>
+        <p>{t("app.loading")}</p>
       </div>
     );
   }
 
   return (
     <>
-      <h1>Diptico</h1>
+      <h1>{t("app.title")}</h1>
       {!isModalOpen && (
         <>
           <div
@@ -313,7 +315,7 @@ function App() {
               className="button button-secondary button-reset"
               onClick={handleReset}
               disabled={images.length === 0}
-              title="Eliminar todas las imágenes"
+              title={t("app.btnResetTitle")}
             >
               <svg
                 width="14"
@@ -331,7 +333,7 @@ function App() {
                 <line x1="10" y1="11" x2="10" y2="17" />
                 <line x1="14" y1="11" x2="14" y2="17" />
               </svg>
-              Reiniciar
+              {t("app.btnReset")}
             </button>
           </div>
 
@@ -359,7 +361,7 @@ function App() {
                 <path d="M21 17v4" />
                 <path d="M19 19h4" />
               </svg>
-              Generar Dípticos
+              {t("app.btnGenerate")}
             </button>
 
             <button
@@ -382,7 +384,7 @@ function App() {
                 <circle cx="12" cy="12" r="3" />
               </svg>
               <span style={{ color: "#ffffff" }}>
-                Ver Dípticos ({diptychs.length})
+                {t("app.btnView", { count: diptychs.length })}
               </span>
             </button>
           </div>
@@ -404,7 +406,7 @@ function App() {
                   )
                 }
                 disabled={!hasGenerated}
-                title="Cambiar Diseño de Grilla"
+                title={t("app.btnFlipOrientationTitle")}
               >
                 {gridLayout === "horizontal" ? (
                   <svg
@@ -435,14 +437,14 @@ function App() {
                     <path d="M3 12h18" />
                   </svg>
                 )}
-                Cambiar orientación
+                {t("app.btnFlipOrientation")}
               </button>
 
               <button
                 className="button button-secondary"
                 onClick={() => setAllDiptychsStarred(true)}
                 disabled={!hasGenerated}
-                title="Marcar todos como destacados"
+                title={t("app.btnSelectAllTitle")}
               >
                 <div style={{ color: "#67e8f9", display: "flex" }}>
                   <svg
@@ -455,14 +457,14 @@ function App() {
                     <path d="M11.48 3.5a.56.56 0 0 1 1.04 0l2.13 5.11a.56.56 0 0 0 .47.34l5.52.44a.56.56 0 0 1 .32.98l-4.2 3.6a.56.56 0 0 0-.18.56l1.28 5.38a.56.56 0 0 1-.83.61l-4.73-2.89a.56.56 0 0 0-.58 0l-4.73 2.89a.56.56 0 0 1-.83-.6l1.28-5.39a.56.56 0 0 0-.18-.56l-4.2-3.6a.56.56 0 0 1 .32-.98l5.52-.44a.56.56 0 0 0 .47-.34z" />
                   </svg>
                 </div>
-                Seleccionar todos
+                {t("app.btnSelectAll")}
               </button>
 
               <button
                 className="button button-secondary"
                 onClick={() => setAllDiptychsStarred(false)}
                 disabled={!hasGenerated}
-                title="Quitar destacado de todos"
+                title={t("app.btnSelectNoneTitle")}
               >
                 <div style={{ color: "#000000", display: "flex" }}>
                   <svg
@@ -475,7 +477,7 @@ function App() {
                     <path d="M11.48 3.5a.56.56 0 0 1 1.04 0l2.13 5.11a.56.56 0 0 0 .47.34l5.52.44a.56.56 0 0 1 .32.98l-4.2 3.6a.56.56 0 0 0-.18.56l1.28 5.38a.56.56 0 0 1-.83.61l-4.73-2.89a.56.56 0 0 0-.58 0l-4.73 2.89a.56.56 0 0 1-.83-.6l1.28-5.39a.56.56 0 0 0-.18-.56l-4.2-3.6a.56.56 0 0 1 .32-.98l5.52-.44a.56.56 0 0 0 .47-.34z" />
                   </svg>
                 </div>
-                Seleccionar ninguno
+                {t("app.btnSelectNone")}
               </button>
               <button
                 className="button button-secondary"
@@ -484,7 +486,7 @@ function App() {
                 style={{ borderColor: "#10b981", color: "#10b981" }}
               >
                 {isDownloading ? (
-                  "Generando..."
+                  t("app.btnDownloading")
                 ) : (
                   <>
                     <svg
@@ -502,7 +504,7 @@ function App() {
                       <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                     <span style={{ color: "#ffffff" }}>
-                      Descargar PDF ({starredCount})
+                      {t("app.btnDownload", { count: starredCount })}
                     </span>
                   </>
                 )}
