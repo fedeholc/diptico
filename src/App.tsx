@@ -239,6 +239,7 @@ function App() {
               className="button button-secondary"
               onClick={() => openModal(0)}
               disabled={!hasGenerated}
+              style={{ borderColor: "#10b981", color: "#10b981" }}
             >
               <svg
                 width="20"
@@ -253,36 +254,9 @@ function App() {
                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
-              Ver Dípticos ({diptychs.length})
-            </button>
-
-            <button
-              className="button button-secondary"
-              onClick={downloadPDF}
-              disabled={!hasGenerated || isDownloading}
-              style={{ borderColor: "#10b981", color: "#10b981" }}
-            >
-              {isDownloading ? (
-                "Generando..."
-              ) : (
-                <>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
-                  Descargar PDF
-                </>
-              )}
+              <span style={{ color: "#ffffff" }}>
+                Ver Dípticos ({diptychs.length})
+              </span>
             </button>
           </div>
 
@@ -375,6 +349,34 @@ function App() {
                   </svg>
                 </div>
                 Seleccionar ninguno
+              </button>
+              <button
+                className="button button-secondary"
+                onClick={downloadPDF}
+                disabled={!hasGenerated || isDownloading}
+                style={{ borderColor: "#10b981", color: "#10b981" }}
+              >
+                {isDownloading ? (
+                  "Generando..."
+                ) : (
+                  <>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span style={{ color: "#ffffff" }}>Descargar PDF</span>
+                  </>
+                )}
               </button>
             </div>
           )}
