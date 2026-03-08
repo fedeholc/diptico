@@ -9,6 +9,7 @@
   --border-color: rgba(255, 255, 255, 0.1);
   --glass-effect: blur(12px) saturate(180%);
   --transition-speed: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --star-active-color: #38bdf8;
 }
 
 * {
@@ -147,6 +148,13 @@ h1 {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .modal-overlay {
@@ -381,8 +389,53 @@ h1 {
 }
 
 .diptych-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-secondary);
-  text-align: center;
+}
+
+.star-toggle,
+.star-toggle-modal {
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #000000;
+  transition: transform var(--transition-speed), color var(--transition-speed);
+}
+
+.star-toggle {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.star-toggle:hover,
+.star-toggle-modal:hover {
+  transform: scale(1.08);
+}
+
+.star-toggle.is-starred,
+.star-toggle-modal.is-starred {
+  color: var(--star-active-color);
+}
+
+.star-toggle-modal {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-wrap: wrap;
+  }
+
+  .bulk-actions {
+    justify-content: center;
+  }
 }

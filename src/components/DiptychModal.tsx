@@ -2,6 +2,8 @@ import React, { useEffect, useCallback, useState } from "react";
 
 interface DiptychModalProps {
   diptych: [string, string];
+  isStarred: boolean;
+  onToggleStar: () => void;
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
@@ -10,6 +12,8 @@ interface DiptychModalProps {
 
 export const DiptychModal: React.FC<DiptychModalProps> = ({
   diptych,
+  isStarred,
+  onToggleStar,
   onNext,
   onPrev,
   onClose,
@@ -31,8 +35,9 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
         setLayout((prev) =>
           prev === "horizontal" ? "vertical" : "horizontal",
         );
+      if (e.key === "s" || e.key === "S") onToggleStar();
     },
-    [onNext, onPrev, onClose],
+    [onNext, onPrev, onClose, onToggleStar],
   );
 
   const handleWheel = useCallback(
@@ -90,7 +95,7 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
         <button
           className="toolbar-button"
           onClick={() => setIsSwapped(!isSwapped)}
-          title="Intercambiar (S)"
+          title="Intercambiar (C)"
         >
           {layout === "horizontal" ? (
             <svg
@@ -121,6 +126,23 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
               <path d="m7 9 5-5 5 5" />
             </svg>
           )}
+        </button>
+
+        <button
+          className={`toolbar-button star-toggle-modal ${isStarred ? "is-starred" : ""}`}
+          onClick={onToggleStar}
+          title={isStarred ? "Quitar destacado (S)" : "Marcar destacado (S)"}
+          aria-label={isStarred ? "Quitar destacado" : "Marcar destacado"}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M11.48 3.5a.56.56 0 0 1 1.04 0l2.13 5.11a.56.56 0 0 0 .47.34l5.52.44a.56.56 0 0 1 .32.98l-4.2 3.6a.56.56 0 0 0-.18.56l1.28 5.38a.56.56 0 0 1-.83.61l-4.73-2.89a.56.56 0 0 0-.58 0l-4.73 2.89a.56.56 0 0 1-.83-.6l1.28-5.39a.56.56 0 0 0-.18-.56l-4.2-3.6a.56.56 0 0 1 .32-.98l5.52-.44a.56.56 0 0 0 .47-.34z" />
+          </svg>
         </button>
 
         <button
@@ -233,6 +255,10 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
             <div className="shortcut-item">
               <span className="shortcut-key">C</span>
               <span className="shortcut-desc">Intercambiar</span>
+            </div>
+            <div className="shortcut-item">
+              <span className="shortcut-key">S</span>
+              <span className="shortcut-desc">Destacar / quitar</span>
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">V</span>

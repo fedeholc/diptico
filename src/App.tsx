@@ -5,9 +5,14 @@ import { ImageGrid } from "./components/ImageGrid";
 import { DiptychModal } from "./components/DiptychModal";
 import { DiptychGrid } from "./components/DiptychGrid";
 
+type DiptychItem = {
+  images: [string, string];
+  starred: boolean;
+};
+
 function App() {
   const [images, setImages] = useState<string[]>([]);
-  const [diptychs, setDiptychs] = useState<[string, string][]>([]);
+  const [diptychs, setDiptychs] = useState<DiptychItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -22,15 +27,29 @@ function App() {
   }, []);
 
   const generateDiptychs = useCallback(() => {
-    const combinations: [string, string][] = [];
+    const combinations: DiptychItem[] = [];
     for (let i = 0; i < images.length; i++) {
       for (let j = 0; j < images.length; j++) {
         if (i === j) continue;
-        combinations.push([images[i], images[j]]);
+        combinations.push({ images: [images[i], images[j]], starred: false });
       }
     }
     setDiptychs(combinations);
   }, [images]);
+
+  const toggleDiptychStar = useCallback((index: number) => {
+    setDiptychs((prev) =>
+      prev.map((diptych, diptychIndex) =>
+        diptychIndex === index
+          ? { ...diptych, starred: !diptych.starred }
+          : diptych,
+      ),
+    );
+  }, []);
+
+  const setAllDiptychsStarred = useCallback((starred: boolean) => {
+    setDiptychs((prev) => prev.map((diptych) => ({ ...diptych, starred })));
+  }, []);
 
   const openModal = useCallback(
     (index = 0) => {
@@ -124,7 +143,7 @@ function App() {
       for (let i = 0; i < diptychs.length; i++) {
         if (i > 0) doc.addPage();
 
-        const [leftUrl, rightUrl] = diptychs[i];
+        const [leftUrl, rightUrl] = diptychs[i].images;
 
         // Parallel load dimensions
         const [leftDim, rightDim] = await Promise.all([
@@ -269,7 +288,7 @@ function App() {
             }}
           ></hr>
           {diptychs.length > 0 && (
-            <div>
+            <div className="bulk-actions">
               <button
                 className="button button-secondary"
                 onClick={() =>
@@ -311,12 +330,31 @@ function App() {
                 )}
                 Cambiar orientación
               </button>
+
+              <button
+                className="button button-secondary"
+                onClick={() => setAllDiptychsStarred(true)}
+                disabled={!hasGenerated}
+                title="Marcar todos como destacados"
+              >
+                Seleccionar todos
+              </button>
+
+              <button
+                className="button button-secondary"
+                onClick={() => setAllDiptychsStarred(false)}
+                disabled={!hasGenerated}
+                title="Quitar destacado de todos"
+              >
+                Seleccionar ninguno
+              </button>
             </div>
           )}
 
           <DiptychGrid
             diptychs={diptychs}
             onSelect={(index) => openModal(index)}
+            onToggleStar={toggleDiptychStar}
             layout={gridLayout}
           />
         </>
@@ -324,7 +362,9 @@ function App() {
 
       {isModalOpen && diptychs.length > 0 && (
         <DiptychModal
-          diptych={diptychs[currentIndex]}
+          diptych={diptychs[currentIndex].images}
+          isStarred={diptychs[currentIndex].starred}
+          onToggleStar={() => toggleDiptychStar(currentIndex)}
           onNext={nextDiptych}
           onPrev={prevDiptych}
           onClose={() => setIsModalOpen(false)}
