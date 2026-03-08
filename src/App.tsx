@@ -21,7 +21,7 @@ type DiptychItem = {
 };
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [images, setImages] = useState<string[]>([]);
   const [diptychs, setDiptychs] = useState<DiptychItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -297,6 +297,20 @@ function App() {
 
   return (
     <>
+      <div className="language-switcher">
+        <button
+          className={`lang-btn ${i18n.language.startsWith("es") ? "active" : ""}`}
+          onClick={() => i18n.changeLanguage("es")}
+        >
+          ES
+        </button>
+        <button
+          className={`lang-btn ${i18n.language.startsWith("en") ? "active" : ""}`}
+          onClick={() => i18n.changeLanguage("en")}
+        >
+          EN
+        </button>
+      </div>
       <h1>{t("app.title")}</h1>
       {!isModalOpen && (
         <>

@@ -12,6 +12,43 @@
   --star-active-color: #38bdf8;
 }
 
+.language-switcher {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 1100;
+  display: flex;
+  gap: 0.5rem;
+  background: var(--panel-bg);
+  backdrop-filter: var(--glass-effect);
+  padding: 0.4rem;
+  border-radius: 2rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.lang-btn {
+  background: transparent;
+  border:none;
+  color: var(--text-secondary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.lang-btn:hover {
+  color: var(--text-primary);
+}
+
+.lang-btn.active {
+  background: var(--accent-color);
+  color: var(--bg-color);
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
