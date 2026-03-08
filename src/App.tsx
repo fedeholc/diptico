@@ -1,9 +1,18 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { jsPDF } from "jspdf";
 import { Dropzone } from "./components/Dropzone";
 import { ImageGrid } from "./components/ImageGrid";
 import { DiptychModal } from "./components/DiptychModal";
 import { DiptychGrid } from "./components/DiptychGrid";
+import {
+  saveImage,
+  getImages,
+  clearImages,
+  saveUISettings,
+  getUISettings,
+  type StoredImage,
+  type UISettings,
+} from "./utils/storage";
 
 type DiptychItem = {
   images: [string, string];
@@ -19,18 +28,92 @@ function App() {
   const [gridLayout, setGridLayout] = useState<"horizontal" | "vertical">(
     "horizontal",
   );
+  const [isInitialized, setIsInitialized] = useState(false);
+  const imagesRef = useRef<string[]>([]);
 
-  const handleFilesSelected = useCallback((files: File[]) => {
-    const urls = files.map((file) => URL.createObjectURL(file));
-    setImages((prev) => [...prev, ...urls]);
+  // Update ref when images changes
+  useEffect(() => {
+    imagesRef.current = images;
+  }, [images]);
+
+  // Handle Hydration
+  useEffect(() => {
+    const init = async () => {
+      let storedImages: StoredImage[] = [];
+      let storedSettings: UISettings | null = null;
+      try {
+        storedImages = await getImages();
+        storedSettings = getUISettings();
+      } catch (error) {
+        console.error("Error loading persisted state:", error);
+      }
+
+      if (!storedImages || storedImages.length === 0) {
+        setIsInitialized(true);
+        return;
+      }
+
+      if (storedImages.length > 0) {
+        const urls = storedImages.map((img) => URL.createObjectURL(img.blob));
+        setImages(urls);
+
+        if (storedSettings?.diptychs) {
+          const restoredDiptychs = storedSettings.diptychs
+            .filter(
+              (d) =>
+                urls[d.leftIdx] !== undefined && urls[d.rightIdx] !== undefined,
+            )
+            .map((d) => ({
+              starred: d.starred,
+              images: [urls[d.leftIdx], urls[d.rightIdx]] as [string, string],
+            }));
+          setDiptychs(restoredDiptychs);
+        }
+      }
+
+      if (storedSettings?.gridLayout) {
+        setGridLayout(storedSettings.gridLayout);
+      }
+
+      setIsInitialized(true);
+    };
+    init();
+  }, []);
+
+  // Persist UI State on changes
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const diptychsToSave = diptychs.map((d) => ({
+      starred: d.starred,
+      leftIdx: images.indexOf(d.images[0]),
+      rightIdx: images.indexOf(d.images[1]),
+    }));
+
+    saveUISettings({
+      gridLayout,
+      diptychs: diptychsToSave,
+    });
+  }, [diptychs, gridLayout, images, isInitialized]);
+
+  const handleFilesSelected = useCallback(async (files: File[]) => {
+    const newImages: string[] = [];
+    for (const file of files) {
+      const id = crypto.randomUUID();
+      await saveImage(id, file, file.name);
+      newImages.push(URL.createObjectURL(file));
+    }
+    setImages((prev) => [...prev, ...newImages]);
     setDiptychs([]);
   }, []);
 
-  const handleReset = useCallback(() => {
-    images.forEach((url) => URL.revokeObjectURL(url));
+  const handleReset = useCallback(async () => {
+    imagesRef.current.forEach((url) => URL.revokeObjectURL(url));
+    await clearImages();
+    localStorage.removeItem("diptico_settings");
     setImages([]);
     setDiptychs([]);
-  }, [images]);
+  }, []);
 
   const generateDiptychs = useCallback(() => {
     const combinations: DiptychItem[] = [];
@@ -144,7 +227,6 @@ function App() {
             },
           ];
 
-    // Helper function to load image and get dimensions
     const getImageDimensions = (
       url: string,
     ): Promise<{ width: number; height: number }> => {
@@ -162,7 +244,6 @@ function App() {
 
       const [leftUrl, rightUrl] = starredDiptychs[i].images;
 
-      // Parallel load dimensions
       const [leftDim, rightDim] = await Promise.all([
         getImageDimensions(leftUrl),
         getImageDimensions(rightUrl),
@@ -178,16 +259,13 @@ function App() {
 
         let finalW, finalH;
         if (ratio > areaRatio) {
-          // Limited by width
           finalW = area.width;
           finalH = area.width / ratio;
         } else {
-          // Limited by height
           finalH = area.height;
           finalW = area.height * ratio;
         }
 
-        // Center in its area
         const x = area.x + (area.width - finalW) / 2;
         const y = area.y + (area.height - finalH) / 2;
 
@@ -206,6 +284,14 @@ function App() {
   const canGenerate = images.length >= 2;
   const hasGenerated = diptychs.length > 0;
   const starredCount = diptychs.filter((d) => d.starred).length;
+
+  if (!isInitialized) {
+    return (
+      <div className="loading-screen">
+        <p>Cargando estado guardado...</p>
+      </div>
+    );
+  }
 
   return (
     <>
