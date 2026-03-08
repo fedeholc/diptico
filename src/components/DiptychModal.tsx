@@ -26,7 +26,7 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
       if (e.key === "ArrowRight") onNext();
       if (e.key === "ArrowLeft") onPrev();
       if (e.key === "Escape") onClose();
-      if (e.key === "s" || e.key === "S") setIsSwapped((prev) => !prev);
+      if (e.key === "c" || e.key === "C") setIsSwapped((prev) => !prev);
       if (e.key === "v" || e.key === "V")
         setLayout((prev) =>
           prev === "horizontal" ? "vertical" : "horizontal",
@@ -231,12 +231,12 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
               <span className="shortcut-desc">Anterior / Siguiente</span>
             </div>
             <div className="shortcut-item">
-              <span className="shortcut-key">S</span>
+              <span className="shortcut-key">C</span>
               <span className="shortcut-desc">Intercambiar</span>
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">V</span>
-              <span className="shortcut-desc">Diseño H/V</span>
+              <span className="shortcut-desc">Orientación H/V</span>
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">Esc</span>
