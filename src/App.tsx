@@ -55,8 +55,9 @@ function App() {
     setIsDownloading(true);
 
     try {
+      const orientation = gridLayout === "vertical" ? "portrait" : "landscape";
       const doc = new jsPDF({
-        orientation: "landscape",
+        orientation,
         unit: "mm",
         format: "a4",
       });
@@ -66,9 +67,46 @@ function App() {
       const margin = 10;
       const gap = 10;
 
-      const availableWidth = pageWidth - margin * 2 - gap;
+      const availableWidth = pageWidth - margin * 2;
       const availableHeight = pageHeight - margin * 2;
-      const targetAreaWidth = availableWidth / 2;
+
+      type ImageArea = {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+      };
+
+      const imageAreas: [ImageArea, ImageArea] =
+        gridLayout === "vertical"
+          ? [
+              {
+                x: margin,
+                y: margin,
+                width: availableWidth,
+                height: (availableHeight - gap) / 2,
+              },
+              {
+                x: margin,
+                y: margin + (availableHeight - gap) / 2 + gap,
+                width: availableWidth,
+                height: (availableHeight - gap) / 2,
+              },
+            ]
+          : [
+              {
+                x: margin,
+                y: margin,
+                width: (availableWidth - gap) / 2,
+                height: availableHeight,
+              },
+              {
+                x: margin + (availableWidth - gap) / 2 + gap,
+                y: margin,
+                width: (availableWidth - gap) / 2,
+                height: availableHeight,
+              },
+            ];
 
       // Helper function to load image and get dimensions
       const getImageDimensions = (
@@ -97,31 +135,31 @@ function App() {
         const drawImageInArea = (
           url: string,
           dim: { width: number; height: number },
-          xOffset: number,
+          area: ImageArea,
         ) => {
           const ratio = dim.width / dim.height;
-          const areaRatio = targetAreaWidth / availableHeight;
+          const areaRatio = area.width / area.height;
 
           let finalW, finalH;
           if (ratio > areaRatio) {
             // Limited by width
-            finalW = targetAreaWidth;
-            finalH = targetAreaWidth / ratio;
+            finalW = area.width;
+            finalH = area.width / ratio;
           } else {
             // Limited by height
-            finalH = availableHeight;
-            finalW = availableHeight * ratio;
+            finalH = area.height;
+            finalW = area.height * ratio;
           }
 
           // Center in its area
-          const x = xOffset + (targetAreaWidth - finalW) / 2;
-          const y = margin + (availableHeight - finalH) / 2;
+          const x = area.x + (area.width - finalW) / 2;
+          const y = area.y + (area.height - finalH) / 2;
 
           doc.addImage(url, "JPEG", x, y, finalW, finalH, undefined, "FAST");
         };
 
-        drawImageInArea(leftUrl, leftDim, margin);
-        drawImageInArea(rightUrl, rightDim, margin + targetAreaWidth + gap);
+        drawImageInArea(leftUrl, leftDim, imageAreas[0]);
+        drawImageInArea(rightUrl, rightDim, imageAreas[1]);
       }
 
       doc.save("dipticos-generados.pdf");
@@ -133,7 +171,7 @@ function App() {
     } finally {
       setIsDownloading(false);
     }
-  }, [diptychs]);
+  }, [diptychs, gridLayout]);
 
   const canGenerate = images.length >= 2;
   const hasGenerated = diptychs.length > 0;
