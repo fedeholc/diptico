@@ -249,6 +249,8 @@ h1 {
 .toolbar-button-close {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
+  /*  color: white; */
+  margin-top: 1rem;
 }
 
 .toolbar-button-close:hover {
@@ -400,7 +402,7 @@ h1 {
 
 .star-toggle,
 .star-toggle-modal {
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   display: inline-flex;
   align-items: center;
@@ -415,10 +417,10 @@ h1 {
   height: 1.5rem;
 }
 
-.star-toggle:hover,
+/* .star-toggle:hover,
 .star-toggle-modal:hover {
   transform: scale(1.08);
-}
+} */
 
 .star-toggle.is-starred,
 .star-toggle-modal.is-starred {
