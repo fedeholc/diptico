@@ -1,0 +1,300 @@
+import { useState, useCallback } from "react";
+import { jsPDF } from "jspdf";
+import { Dropzone } from "./components/Dropzone";
+import { ImageGrid } from "./components/ImageGrid";
+import { DiptychModal } from "./components/DiptychModal";
+import { DiptychGrid } from "./components/DiptychGrid";
+
+function App() {
+  const [images, setImages] = useState<string[]>([]);
+  const [diptychs, setDiptychs] = useState<[string, string][]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [gridLayout, setGridLayout] = useState<"horizontal" | "vertical">(
+    "horizontal",
+  );
+
+  const handleFilesSelected = useCallback((files: File[]) => {
+    const urls = files.map((file) => URL.createObjectURL(file));
+    setImages((prev) => [...prev, ...urls]);
+    setDiptychs([]);
+  }, []);
+
+  const generateDiptychs = useCallback(() => {
+    const combinations: [string, string][] = [];
+    for (let i = 0; i < images.length; i++) {
+      for (let j = 0; j < images.length; j++) {
+        if (i === j) continue;
+        combinations.push([images[i], images[j]]);
+      }
+    }
+    setDiptychs(combinations);
+  }, [images]);
+
+  const openModal = useCallback(
+    (index = 0) => {
+      if (diptychs.length > index) {
+        setCurrentIndex(index);
+        setIsModalOpen(true);
+      }
+    },
+    [diptychs],
+  );
+
+  const nextDiptych = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % diptychs.length);
+  }, [diptychs.length]);
+
+  const prevDiptych = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + diptychs.length) % diptychs.length);
+  }, [diptychs.length]);
+
+  const downloadPDF = useCallback(async () => {
+    if (diptychs.length === 0) return;
+    setIsDownloading(true);
+
+    try {
+      const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 10;
+      const gap = 10;
+
+      const availableWidth = pageWidth - margin * 2 - gap;
+      const availableHeight = pageHeight - margin * 2;
+      const targetAreaWidth = availableWidth / 2;
+
+      // Helper function to load image and get dimensions
+      const getImageDimensions = (
+        url: string,
+      ): Promise<{ width: number; height: number }> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () =>
+            resolve({ width: img.naturalWidth, height: img.naturalHeight });
+          img.onerror = reject;
+          img.src = url;
+        });
+      };
+
+      for (let i = 0; i < diptychs.length; i++) {
+        if (i > 0) doc.addPage();
+
+        const [leftUrl, rightUrl] = diptychs[i];
+
+        // Parallel load dimensions
+        const [leftDim, rightDim] = await Promise.all([
+          getImageDimensions(leftUrl),
+          getImageDimensions(rightUrl),
+        ]);
+
+        const drawImageInArea = (
+          url: string,
+          dim: { width: number; height: number },
+          xOffset: number,
+        ) => {
+          const ratio = dim.width / dim.height;
+          const areaRatio = targetAreaWidth / availableHeight;
+
+          let finalW, finalH;
+          if (ratio > areaRatio) {
+            // Limited by width
+            finalW = targetAreaWidth;
+            finalH = targetAreaWidth / ratio;
+          } else {
+            // Limited by height
+            finalH = availableHeight;
+            finalW = availableHeight * ratio;
+          }
+
+          // Center in its area
+          const x = xOffset + (targetAreaWidth - finalW) / 2;
+          const y = margin + (availableHeight - finalH) / 2;
+
+          doc.addImage(url, "JPEG", x, y, finalW, finalH, undefined, "FAST");
+        };
+
+        drawImageInArea(leftUrl, leftDim, margin);
+        drawImageInArea(rightUrl, rightDim, margin + targetAreaWidth + gap);
+      }
+
+      doc.save("dipticos-generados.pdf");
+    } catch (error) {
+      console.error("Error al generar PDF:", error);
+      alert(
+        "Hubo un error al generar el PDF. Revisa la consola para más detalles.",
+      );
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [diptychs]);
+
+  const canGenerate = images.length >= 2;
+  const hasGenerated = diptychs.length > 0;
+
+  return (
+    <>
+      <h1>Diptico</h1>
+      {!isModalOpen && (
+        <>
+          <Dropzone onFilesSelected={handleFilesSelected} />
+
+          <ImageGrid images={images} />
+
+          <div className="actions">
+            <button
+              className="button button-primary"
+              onClick={generateDiptychs}
+              disabled={!canGenerate}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                <path d="M5 3v4" />
+                <path d="M3 5h4" />
+                <path d="M21 17v4" />
+                <path d="M19 19h4" />
+              </svg>
+              Generar Dípticos
+            </button>
+
+            <button
+              className="button button-secondary"
+              onClick={() => openModal(0)}
+              disabled={!hasGenerated}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              Ver Dípticos ({diptychs.length})
+            </button>
+
+            <button
+              className="button button-secondary"
+              onClick={downloadPDF}
+              disabled={!hasGenerated || isDownloading}
+              style={{ borderColor: "#10b981", color: "#10b981" }}
+            >
+              {isDownloading ? (
+                "Generando..."
+              ) : (
+                <>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Descargar PDF
+                </>
+              )}
+            </button>
+          </div>
+
+          <hr
+            style={{
+              width: "100%",
+              margin: "2rem 0",
+              borderColor: "var(--panel-bg)",
+            }}
+          ></hr>
+          {diptychs.length > 0 && (
+            <div>
+              <button
+                className="button button-secondary"
+                onClick={() =>
+                  setGridLayout((prev) =>
+                    prev === "horizontal" ? "vertical" : "horizontal",
+                  )
+                }
+                disabled={!hasGenerated}
+                title="Cambiar Diseño de Grilla"
+              >
+                {gridLayout === "horizontal" ? (
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                    <path d="M12 3v18" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                    <path d="M3 12h18" />
+                  </svg>
+                )}
+                Cambiar orientación
+              </button>
+            </div>
+          )}
+
+          <DiptychGrid
+            diptychs={diptychs}
+            onSelect={(index) => openModal(index)}
+            layout={gridLayout}
+          />
+        </>
+      )}
+
+      {isModalOpen && diptychs.length > 0 && (
+        <DiptychModal
+          diptych={diptychs[currentIndex]}
+          onNext={nextDiptych}
+          onPrev={prevDiptych}
+          onClose={() => setIsModalOpen(false)}
+          initialLayout={gridLayout}
+        />
+      )}
+    </>
+  );
+}
+
+export default App;
