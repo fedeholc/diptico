@@ -1,1 +1,1 @@
-# Diptico
+# Díptico

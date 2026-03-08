@@ -278,7 +278,7 @@ function App() {
       drawImageInArea(rightUrl, rightDim, imageAreas[1]);
     }
 
-    doc.save("dipticos-generados.pdf");
+    doc.save("dípticos-generados.pdf");
     setIsDownloading(false);
     return;
   }, [diptychs, gridLayout, t]);
