@@ -73,123 +73,129 @@ function App() {
     if (diptychs.length === 0) return;
     setIsDownloading(true);
 
+    const orientation = gridLayout === "vertical" ? "portrait" : "landscape";
+    let doc: jsPDF | null = null;
     try {
-      const orientation = gridLayout === "vertical" ? "portrait" : "landscape";
-      const doc = new jsPDF({
+      doc = new jsPDF({
         orientation,
         unit: "mm",
         format: "a4",
       });
-
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 10;
-      const gap = 10;
-
-      const availableWidth = pageWidth - margin * 2;
-      const availableHeight = pageHeight - margin * 2;
-
-      type ImageArea = {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-      };
-
-      const imageAreas: [ImageArea, ImageArea] =
-        gridLayout === "vertical"
-          ? [
-              {
-                x: margin,
-                y: margin,
-                width: availableWidth,
-                height: (availableHeight - gap) / 2,
-              },
-              {
-                x: margin,
-                y: margin + (availableHeight - gap) / 2 + gap,
-                width: availableWidth,
-                height: (availableHeight - gap) / 2,
-              },
-            ]
-          : [
-              {
-                x: margin,
-                y: margin,
-                width: (availableWidth - gap) / 2,
-                height: availableHeight,
-              },
-              {
-                x: margin + (availableWidth - gap) / 2 + gap,
-                y: margin,
-                width: (availableWidth - gap) / 2,
-                height: availableHeight,
-              },
-            ];
-
-      // Helper function to load image and get dimensions
-      const getImageDimensions = (
-        url: string,
-      ): Promise<{ width: number; height: number }> => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () =>
-            resolve({ width: img.naturalWidth, height: img.naturalHeight });
-          img.onerror = reject;
-          img.src = url;
-        });
-      };
-
-      for (let i = 0; i < diptychs.length; i++) {
-        if (i > 0) doc.addPage();
-
-        const [leftUrl, rightUrl] = diptychs[i].images;
-
-        // Parallel load dimensions
-        const [leftDim, rightDim] = await Promise.all([
-          getImageDimensions(leftUrl),
-          getImageDimensions(rightUrl),
-        ]);
-
-        const drawImageInArea = (
-          url: string,
-          dim: { width: number; height: number },
-          area: ImageArea,
-        ) => {
-          const ratio = dim.width / dim.height;
-          const areaRatio = area.width / area.height;
-
-          let finalW, finalH;
-          if (ratio > areaRatio) {
-            // Limited by width
-            finalW = area.width;
-            finalH = area.width / ratio;
-          } else {
-            // Limited by height
-            finalH = area.height;
-            finalW = area.height * ratio;
-          }
-
-          // Center in its area
-          const x = area.x + (area.width - finalW) / 2;
-          const y = area.y + (area.height - finalH) / 2;
-
-          doc.addImage(url, "JPEG", x, y, finalW, finalH, undefined, "FAST");
-        };
-
-        drawImageInArea(leftUrl, leftDim, imageAreas[0]);
-        drawImageInArea(rightUrl, rightDim, imageAreas[1]);
-      }
-
-      doc.save("dipticos-generados.pdf");
     } catch (error) {
       console.error("Error al generar PDF:", error);
-      alert(
-        "Hubo un error al generar el PDF. Revisa la consola para más detalles.",
-      );
-    } finally {
-      setIsDownloading(false);
     }
+
+    if (!doc) {
+      setIsDownloading(false);
+      console.error("No se pudo crear el documento PDF.");
+      return;
+    }
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 10;
+    const gap = 10;
+
+    const availableWidth = pageWidth - margin * 2;
+    const availableHeight = pageHeight - margin * 2;
+
+    type ImageArea = {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
+
+    const imageAreas: [ImageArea, ImageArea] =
+      gridLayout === "vertical"
+        ? [
+            {
+              x: margin,
+              y: margin,
+              width: availableWidth,
+              height: (availableHeight - gap) / 2,
+            },
+            {
+              x: margin,
+              y: margin + (availableHeight - gap) / 2 + gap,
+              width: availableWidth,
+              height: (availableHeight - gap) / 2,
+            },
+          ]
+        : [
+            {
+              x: margin,
+              y: margin,
+              width: (availableWidth - gap) / 2,
+              height: availableHeight,
+            },
+            {
+              x: margin + (availableWidth - gap) / 2 + gap,
+              y: margin,
+              width: (availableWidth - gap) / 2,
+              height: availableHeight,
+            },
+          ];
+
+    // Helper function to load image and get dimensions
+    const getImageDimensions = (
+      url: string,
+    ): Promise<{ width: number; height: number }> => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () =>
+          resolve({ width: img.naturalWidth, height: img.naturalHeight });
+        img.onerror = reject;
+        img.src = url;
+      });
+    };
+
+    for (let i = 0; i < diptychs.length; i++) {
+      if (i > 0) doc.addPage();
+
+      const [leftUrl, rightUrl] = diptychs[i].images;
+
+      // Parallel load dimensions
+      const [leftDim, rightDim] = await Promise.all([
+        getImageDimensions(leftUrl),
+        getImageDimensions(rightUrl),
+      ]);
+
+      const drawImageInArea = (
+        url: string,
+        dim: { width: number; height: number },
+        area: ImageArea,
+      ) => {
+        const ratio = dim.width / dim.height;
+        const areaRatio = area.width / area.height;
+
+        let finalW, finalH;
+        if (ratio > areaRatio) {
+          // Limited by width
+          finalW = area.width;
+          finalH = area.width / ratio;
+        } else {
+          // Limited by height
+          finalH = area.height;
+          finalW = area.height * ratio;
+        }
+
+        // Center in its area
+        const x = area.x + (area.width - finalW) / 2;
+        const y = area.y + (area.height - finalH) / 2;
+
+        doc.addImage(url, "JPEG", x, y, finalW, finalH, undefined, "FAST");
+      };
+
+      drawImageInArea(leftUrl, leftDim, imageAreas[0]);
+      drawImageInArea(rightUrl, rightDim, imageAreas[1]);
+    }
+
+    doc.save("dipticos-generados.pdf");
+    setIsDownloading(false);
+    return;
+
+    setIsDownloading(false);
   }, [diptychs, gridLayout]);
 
   const canGenerate = images.length >= 2;
