@@ -10,6 +10,7 @@
   --glass-effect: blur(12px) saturate(180%);
   --transition-speed: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --star-active-color: #38bdf8;
+  --star-unstarred-color: rgba(169, 169, 169, 0.5);
 }
 
 .language-switcher {
@@ -29,7 +30,7 @@
 
 .lang-btn {
   background: transparent;
-  border:none;
+  border: none;
   color: var(--text-secondary);
   padding: 0.4rem 0.8rem;
   border-radius: 1.5rem;
@@ -460,7 +461,7 @@ h1 {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #000000;
+  color: var(--star-unstarred-color);
   transition: transform var(--transition-speed), color var(--transition-speed);
 }
 

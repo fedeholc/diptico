@@ -480,7 +480,12 @@ function App() {
                 disabled={!hasGenerated}
                 title={t("app.btnSelectNoneTitle")}
               >
-                <div style={{ color: "#000000", display: "flex" }}>
+                <div
+                  style={{
+                    color: "var(--star-unstarred-color",
+                    display: "flex",
+                  }}
+                >
                   <svg
                     width="16"
                     height="16"

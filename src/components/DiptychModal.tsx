@@ -136,15 +136,17 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
           title={isStarred ? t("modal.unstar") : t("modal.star")}
           aria-label={isStarred ? t("modal.unstar") : t("modal.star")}
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M11.48 3.5a.56.56 0 0 1 1.04 0l2.13 5.11a.56.56 0 0 0 .47.34l5.52.44a.56.56 0 0 1 .32.98l-4.2 3.6a.56.56 0 0 0-.18.56l1.28 5.38a.56.56 0 0 1-.83.61l-4.73-2.89a.56.56 0 0 0-.58 0l-4.73 2.89a.56.56 0 0 1-.83-.6l1.28-5.39a.56.56 0 0 0-.18-.56l-4.2-3.6a.56.56 0 0 1 .32-.98l5.52-.44a.56.56 0 0 0 .47-.34z" />
-          </svg>
+          <span>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M11.48 3.5a.56.56 0 0 1 1.04 0l2.13 5.11a.56.56 0 0 0 .47.34l5.52.44a.56.56 0 0 1 .32.98l-4.2 3.6a.56.56 0 0 0-.18.56l1.28 5.38a.56.56 0 0 1-.83.61l-4.73-2.89a.56.56 0 0 0-.58 0l-4.73 2.89a.56.56 0 0 1-.83-.6l1.28-5.39a.56.56 0 0 0-.18-.56l-4.2-3.6a.56.56 0 0 1 .32-.98l5.52-.44a.56.56 0 0 0 .47-.34z" />
+            </svg>
+          </span>
         </button>
 
         <button
@@ -232,7 +234,9 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
             <div className="shortcuts-header">{t("modal.shortcutsTitle")}</div>
             <div className="shortcut-item">
               <span className="shortcut-key">← / →</span>
-              <span className="shortcut-desc">{t("modal.shortcutPrevNext")}</span>
+              <span className="shortcut-desc">
+                {t("modal.shortcutPrevNext")}
+              </span>
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">C</span>
@@ -244,7 +248,9 @@ export const DiptychModal: React.FC<DiptychModalProps> = ({
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">V</span>
-              <span className="shortcut-desc">{t("modal.shortcutOrientation")}</span>
+              <span className="shortcut-desc">
+                {t("modal.shortcutOrientation")}
+              </span>
             </div>
             <div className="shortcut-item">
               <span className="shortcut-key">Esc</span>

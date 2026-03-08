@@ -40,9 +40,7 @@ export const DiptychGrid: React.FC<DiptychGridProps> = ({
               type="button"
               className={`star-toggle ${diptych.starred ? "is-starred" : ""}`}
               title={diptych.starred ? t("grid.unstar") : t("grid.star")}
-              aria-label={
-                diptych.starred ? t("grid.unstar") : t("grid.star")
-              }
+              aria-label={diptych.starred ? t("grid.unstar") : t("grid.star")}
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleStar(index);
