@@ -195,8 +195,6 @@ function App() {
     doc.save("dipticos-generados.pdf");
     setIsDownloading(false);
     return;
-
-    setIsDownloading(false);
   }, [diptychs, gridLayout]);
 
   const canGenerate = images.length >= 2;
