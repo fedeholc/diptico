@@ -70,7 +70,8 @@ function App() {
   }, [diptychs.length]);
 
   const downloadPDF = useCallback(async () => {
-    if (diptychs.length === 0) return;
+    const starredDiptychs = diptychs.filter((d) => d.starred);
+    if (starredDiptychs.length === 0) return;
     setIsDownloading(true);
 
     const orientation = gridLayout === "vertical" ? "portrait" : "landscape";
@@ -150,10 +151,10 @@ function App() {
       });
     };
 
-    for (let i = 0; i < diptychs.length; i++) {
+    for (let i = 0; i < starredDiptychs.length; i++) {
       if (i > 0) doc.addPage();
 
-      const [leftUrl, rightUrl] = diptychs[i].images;
+      const [leftUrl, rightUrl] = starredDiptychs[i].images;
 
       // Parallel load dimensions
       const [leftDim, rightDim] = await Promise.all([
@@ -200,6 +201,7 @@ function App() {
 
   const canGenerate = images.length >= 2;
   const hasGenerated = diptychs.length > 0;
+  const starredCount = diptychs.filter((d) => d.starred).length;
 
   return (
     <>
@@ -353,7 +355,7 @@ function App() {
               <button
                 className="button button-secondary"
                 onClick={downloadPDF}
-                disabled={!hasGenerated || isDownloading}
+                disabled={starredCount === 0 || isDownloading}
                 style={{ borderColor: "#10b981", color: "#10b981" }}
               >
                 {isDownloading ? (
@@ -374,7 +376,9 @@ function App() {
                       <polyline points="7 10 12 15 17 10"></polyline>
                       <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
-                    <span style={{ color: "#ffffff" }}>Descargar PDF</span>
+                    <span style={{ color: "#ffffff" }}>
+                      Descargar PDF ({starredCount})
+                    </span>
                   </>
                 )}
               </button>
